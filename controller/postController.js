@@ -21,9 +21,11 @@ const addPost = async (req, res, next) => {
       userName,
       date,
     });
-    res.status(200).json({ message: "Post Add Successfull", post });
+    res
+      .status(200)
+      .json({ message: "Post Add Successfull", post, success: true });
   } catch (error) {
-    res.status(404).json({ error: error.message });
+    res.status(404).json({ error: error.message, success: false });
     // console.log(error);
   }
 };
@@ -35,16 +37,22 @@ const getPostById = async (req, res) => {
 
   const singlePost = await postingModel.findById(id);
   if (!singlePost) {
-    return res.status(404).json({ error: "No Such Post Found" });
+    return res
+      .status(404)
+      .json({ error: "No Such Post Found", success: false });
   }
-  return res.status(200).json(singlePost);
+  return res.status(200).json({ singlePost, success: true });
 };
 
 //get all posts
 const getAllPost = async (req, res) => {
-  const allPost = await postingModel.find({}).sort({ createdAt: -1 });
+  try {
+    const allPost = await postingModel.find({}).sort({ createdAt: -1 });
 
-  res.status(200).json(allPost);
+    res.status(200).json({ allPost, success: true });
+  } catch (error) {
+    res.status(404).json({ error: error.message, success: false });
+  }
 };
 
 //update post
@@ -55,7 +63,9 @@ const updatePost = async (req, res) => {
     const postCheck = await postingModel.findById(id);
     let image = req.files ? req.files.photo : postCheck.postImage;
     if (!postCheck) {
-      return res.status(400).json({ error: "No Such Post Found" });
+      return res
+        .status(400)
+        .json({ error: "No Such Post Found", success: false });
     }
     const change = {
       discription: req.body.description,
@@ -82,9 +92,11 @@ const updatePost = async (req, res) => {
       new: true,
     });
 
-    return res.status(200).json({ message: "Post Updated Successfull", post });
+    return res
+      .status(200)
+      .json({ message: "Post Updated Successfull", post, success: true });
   } catch (error) {
-    res.status(404).json(error);
+    res.status(404).json({ error: error.message, success: false });
   }
 };
 
@@ -94,7 +106,9 @@ const postDelete = async (req, res) => {
 
   const post = await postingModel.findOneAndDelete({ _id: id });
   if (!post) {
-    return res.status(404).json({ error: "No Such Post Found" });
+    return res
+      .status(404)
+      .json({ error: "No Such Post Found", success: false });
   }
   if (req.files) {
     fs.unlink(`${process.env.POST_IMAGE_PATH}/${post.postImage}`, (err) => {
@@ -104,7 +118,9 @@ const postDelete = async (req, res) => {
       }
     });
   }
-  return res.status(200).json({ message: "Post delete Successfull" });
+  return res
+    .status(200)
+    .json({ message: "Post delete Successfull", success: true });
 };
 module.exports = {
   addPost,

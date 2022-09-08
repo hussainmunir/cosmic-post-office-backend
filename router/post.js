@@ -1,4 +1,6 @@
 const express = require("express");
+const checkAuth = require("../middlerWare/checkAuth");
+
 const {
   getPostById,
   getAllPost,
@@ -8,10 +10,10 @@ const {
 } = require("../controller/postController");
 const router = express.Router();
 
-router.post("/add", addPost);
-router.get("/get/:id", getPostById);
-router.get("/allpost", getAllPost);
-router.put("/update/:id", updatePost);
-router.delete("/delete/:id", postDelete);
+router.post("/add", checkAuth, addPost);
+router.get("/get/:id", checkAuth, getPostById);
+router.get("/allpost", checkAuth, getAllPost);
+router.put("/update/:id", checkAuth, updatePost);
+router.delete("/delete/:id", checkAuth, postDelete);
 
 module.exports = router;

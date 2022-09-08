@@ -25,17 +25,21 @@ const addMission = async (req, res, next) => {
 
     return res
       .status(200)
-      .json({ Message: "Mission Add Successfull", mission });
+      .json({ Message: "Mission Add Successfull", mission, success: true });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ error: error.message, success: false });
     // console.log(error);
   }
 };
 
 const getAllMission = async (req, res) => {
-  const allPost = await missionModel.find({}).sort({ createdAt: -1 });
+  try {
+    const allPost = await missionModel.find({}).sort({ createdAt: -1 });
 
-  res.status(200).json(allPost);
+    res.status(200).json({ allPost, success: true });
+  } catch (error) {
+    res.status(400).json({ error: error.message, success: false });
+  }
 };
 
 /// update mission
@@ -45,7 +49,9 @@ const updateMission = async (req, res) => {
     const missionCheck = await missionModel.findById(id);
     let image = req.files ? req.files.photo : missionCheck.missionImage;
     if (!missionCheck) {
-      return res.status(400).json({ error: "no such mission found" });
+      return res
+        .status(400)
+        .json({ error: "no such mission found", success: false });
     }
     const change = {
       missionID: req.body.missionID,
@@ -75,9 +81,9 @@ const updateMission = async (req, res) => {
 
     return res
       .status(200)
-      .json({ Message: "Mission Update Successfull", mission });
+      .json({ Message: "Mission Update Successfull", mission, success: true });
   } catch (error) {
-    res.status(404).json(error);
+    res.status(404).json({ error: error.message, success: false });
     console.log(error);
   }
 };

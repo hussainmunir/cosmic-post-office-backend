@@ -24,32 +24,41 @@ const userSignup = async (req, res) => {
       userName,
       coordinate,
     });
-    res.status(200).json({ message: "Registration Successfull" });
+    res
+      .status(200)
+      .json({ message: "Registration Successfull", success: true });
   } catch (error) {
-    return res.status(404).json({ error: error.message });
+    return res.status(404).json({ error: error.message, success: false });
     // console.log(error);
   }
 };
 
 ////user login ..................
-const userSignin = async (req, res, next) => {
+const userSignin = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await signin(email, password);
 
     //create token
     const token = createToken(user._id);
-    res.status(200).json({ message: "Login Successfully", user, token });
+    res
+      .status(200)
+      .json({ message: "Login Successfull", user, token, success: true });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ error: error.message, success: false });
+    console.log(error);
   }
 };
 
 // get all user..........................
 const getAllUser = async (req, res) => {
-  const allUser = await User.find({}).sort({ createdAt: -1 });
+  try {
+    const allUser = await User.find({}).sort({ createdAt: -1 });
 
-  res.status(200).json(allUser);
+    res.status(200).json({ allUser, success: true });
+  } catch (error) {
+    res.status(400).json({ error: error.message, success: false });
+  }
 };
 
 //get a single user by id,,,,,,,,,,,,,,,,,,,,,,,,
@@ -61,9 +70,11 @@ const getById = async (req, res) => {
   const user = await User.findById(id);
 
   if (!user) {
-    return res.status(404).json({ error: "no such user found" });
+    return res
+      .status(404)
+      .json({ error: "no such user found", success: false });
   }
-  return res.status(200).json(user);
+  return res.status(200).json({ user, success: true });
 };
 
 //delete user by Id
@@ -72,7 +83,9 @@ const userDelete = async (req, res) => {
 
   const user = await User.findOneAndDelete({ _id: id });
   if (!user) {
-    return res.status(404).json({ error: "no such user found" });
+    return res
+      .status(404)
+      .json({ error: "no such user found", success: false });
   }
   if (req.files) {
     fs.unlink(`${process.env.FILE_UPLOAD_PATH}/${user.userImage}`, (err) => {
@@ -82,7 +95,7 @@ const userDelete = async (req, res) => {
       }
     });
   }
-  return res.status(200).json({ message: "Delete Successfully" });
+  return res.status(200).json({ message: "Delete Successfull", success: true });
 };
 
 //update user ........................
@@ -93,7 +106,9 @@ const updateUser = async (req, res) => {
     const userCheck = await User.findById(id);
     let image = req.files ? req.files.photo : userCheck.userImage;
     if (!userCheck) {
-      return res.status(400).json({ error: "no such user found" });
+      return res
+        .status(400)
+        .json({ error: "no such user found", success: false });
     }
     const change = {
       userName: req.body.userName,
@@ -122,9 +137,11 @@ const updateUser = async (req, res) => {
       new: true,
     });
 
-    return res.status(200).json({ message: "Update Successfull", post });
+    return res
+      .status(200)
+      .json({ message: "Update Successfull", post, success: true });
   } catch (error) {
-    res.status(404).json(error);
+    res.status(404).json(error, { success: false });
     // console.log(error);
   }
 };
@@ -135,9 +152,11 @@ const passwordReset = async (req, res) => {
 
     const resetpassword = await reset(email, password);
 
-    res.status(200).json({ message: "Password Reset Successfull" });
+    res
+      .status(200)
+      .json({ message: "Password Reset Successfull", success: true });
   } catch (error) {
-    return res.status(404).json({ error: error.message });
+    return res.status(404).json({ error: error.message, success: false });
     // console.log(error);
   }
 };
