@@ -1,7 +1,7 @@
 const postModel = require("../models/postingModel");
 
-const addPostAuth = async (description, userId, date) => {
-  if (!description || !date || !userId) {
+const addPostAuth = async (description, userId, date, title) => {
+  if (!description || !date || !userId || !title) {
     throw Error("All fields must be filled");
   }
 

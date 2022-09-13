@@ -8,12 +8,11 @@ const { getById } = require("./user");
 // add post
 const addPost = async (req, res, next) => {
   try {
-    let { postImage, description, date, userId } = req.body;
+    let { postImage, description, date, userId , title } = req.body;
     // postImage = "";
 
-    await addPostAuth(description, userId, date);
+    await addPostAuth(description, userId, date, title);
     const user = await User.findById(userId);
-    console.log(user);
     if (!user || user === null) {
       res.status(400).json({ error: "user not found", success: false });
     }else{
@@ -27,10 +26,16 @@ const addPost = async (req, res, next) => {
       postImage = path;
     }
     const post = await postingModel.create({
+      title,
       postImage,
       description,
       date,
-      user: user,
+      userId: user.id,
+      userName: user.userName,
+      userEmail: user.email,
+      userImage: user.userImage,
+      coordinate: user.coordinate
+
     });
 
     res
