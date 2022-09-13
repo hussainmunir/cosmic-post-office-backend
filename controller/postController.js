@@ -2,13 +2,24 @@ const postingModel = require("../models/postingModel");
 const { addPostAuth } = require("../authentication/postAuth");
 const { uploadPostImage } = require("../helper/postImage");
 const fs = require("fs");
+const User = require("../models/user");
+const { getById } = require("./user");
 
 // add post
 const addPost = async (req, res, next) => {
   try {
-    let { postImage, description, userName, date } = req.body;
+    let { postImage, description, date, userId } = req.body;
     // postImage = "";
-    await addPostAuth(description, userName, date);
+
+    await addPostAuth(description, userId, date);
+    const user = await User.findById(userId);
+    console.log(user);
+    if (!user || user === null) {
+      res.status(400).json({ error: "user not found", success: false });
+    }else{
+
+    
+
     if (req.files) {
       let image = req.files.photo;
 
@@ -18,12 +29,13 @@ const addPost = async (req, res, next) => {
     const post = await postingModel.create({
       postImage,
       description,
-      userName,
       date,
+      user: user,
     });
+
     res
       .status(200)
-      .json({ message: "Post Add Successfull", post, success: true });
+      .json({ message: "Post Add Successfull", post, success: true });}
   } catch (error) {
     res.status(404).json({ error: error.message, success: false });
     // console.log(error);
@@ -35,12 +47,14 @@ const addPost = async (req, res, next) => {
 const getPostById = async (req, res) => {
   const { id } = req.params;
 
-  const singlePost = await postingModel.findById(id);
+  const singlePost = await postingModel.findById(id)
   if (!singlePost) {
     return res
-      .status(404)
-      .json({ error: "No Such Post Found", success: false });
+    .status(404)
+    .json({ error: "No Such Post Found", success: false });
   }
+  
+  
   return res.status(200).json({ singlePost, success: true });
 };
 

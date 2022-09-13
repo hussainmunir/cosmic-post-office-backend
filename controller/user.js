@@ -80,8 +80,10 @@ const getById = async (req, res) => {
 //delete user by Id
 const userDelete = async (req, res) => {
   const { id } = req.params;
+  console.log(id);
 
   const user = await User.findOneAndDelete({ _id: id });
+  console.log(user);
   if (!user) {
     return res
       .status(404)
@@ -141,7 +143,7 @@ const updateUser = async (req, res) => {
       .status(200)
       .json({ message: "Update Successfull", post, success: true });
   } catch (error) {
-    res.status(404).json(error, { success: false });
+    res.status(404).json({ error: error.message, success: false });
     // console.log(error);
   }
 };
