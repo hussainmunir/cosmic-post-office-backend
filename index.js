@@ -6,6 +6,7 @@ const path = require("path");
 const fileupload = require("express-fileupload");
 const postRouter = require("./router/post");
 const missionRouter = require("./router/mission");
+const messageRouter = require("./router/message");
 
 const connectDB = require("./db");
 connectDB();
@@ -26,6 +27,7 @@ app.use("/public", express.static(path.join(__dirname, "/public")));
 app.use("/api/user", userRouter);
 app.use("/api/post", postRouter);
 app.use("/api/mission", missionRouter);
+app.use("/api/message", messageRouter);
 
 const port = process.env.PORT;
 app.listen(port, () => {

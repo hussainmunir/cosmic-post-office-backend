@@ -80,10 +80,10 @@ const getById = async (req, res) => {
 //delete user by Id
 const userDelete = async (req, res) => {
   const { id } = req.params;
-  console.log(id);
+  // console.log(id);
 
   const user = await User.findOneAndDelete({ _id: id });
-  console.log(user);
+  // console.log(user);
   if (!user) {
     return res
       .status(404)
