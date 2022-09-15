@@ -15,24 +15,8 @@ const postingSchema = mongoose.Schema({
 
   date: {
     type: String,
-    required: true,
   },
-  userId: {
-    type: String,
-  },
-  userName: {
-    type: String,
-  },
-  userEmail: {
-    type: String,
-    unique: true,
-  },
-  userImage: {
-    type: String,
-  },
-  coordinate: {
-    type: String,
-  },
+  userId: [{ type: mongoose.Schema.Types.ObjectId, ref: "user" }],
 });
 
 module.exports = mongoose.model("post", postingSchema);

@@ -8,42 +8,36 @@ const { getById } = require("./user");
 // add post
 const addPost = async (req, res, next) => {
   try {
-    let { postImage, description, date, userId , title } = req.body;
+    let { postImage, description, date, userId, title } = req.body;
     // postImage = "";
 
     await addPostAuth(description, userId, date, title);
     const user = await User.findById(userId);
     if (!user || user === null) {
       res.status(400).json({ error: "user not found", success: false });
-    }else{
+    } else {
+      if (req.files) {
+        let image = req.files.photo;
 
-    
+        const path = await uploadPostImage(image);
+        postImage = path;
+      }
 
-    if (req.files) {
-      let image = req.files.photo;
+      const post = await postingModel.create({
+        title,
+        postImage,
+        description,
+        date,
+        userId: user.id,
+      });
 
-      const path = await uploadPostImage(image);
-      postImage = path;
+      res
+        .status(200)
+        .json({ message: "Post Add Successfull", post, success: true });
     }
-    const post = await postingModel.create({
-      title,
-      postImage,
-      description,
-      date,
-      userId: user.id,
-      userName: user.userName,
-      userEmail: user.email,
-      userImage: user.userImage,
-      coordinate: user.coordinate
-
-    });
-
-    res
-      .status(200)
-      .json({ message: "Post Add Successfull", post, success: true });}
   } catch (error) {
     res.status(404).json({ error: error.message, success: false });
-    // console.log(error);
+    console.log(error);
   }
 };
 
@@ -52,21 +46,23 @@ const addPost = async (req, res, next) => {
 const getPostById = async (req, res) => {
   const { id } = req.params;
 
-  const singlePost = await postingModel.findById(id)
+  const singlePost = await postingModel.findById(id).populate("userId");
   if (!singlePost) {
     return res
-    .status(404)
-    .json({ error: "No Such Post Found", success: false });
+      .status(404)
+      .json({ error: "No Such Post Found", success: false });
   }
-  
-  
+
   return res.status(200).json({ singlePost, success: true });
 };
 
 //get all posts
 const getAllPost = async (req, res) => {
   try {
-    const allPost = await postingModel.find({}).sort({ createdAt: -1 });
+    const allPost = await postingModel
+      .find({})
+      .sort({ createdAt: -1 })
+      .populate("userId");
 
     res.status(200).json({ allPost, success: true });
   } catch (error) {
